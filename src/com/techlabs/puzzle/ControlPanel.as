@@ -109,12 +109,14 @@ package com.techlabs.puzzle {
 		private function shuffleBoardHandler(e:Event):void {
 			dispatchEvent(new PuzzleEvent(PuzzleEvent.SHUFFLE));
 			restartTimer();
+			game.playButtonSound();
 		}
 
 		private function uploadImageHandler(e:Event):void {
 			resetTimer();
 			_textBox.visible = !_textBox.visible;
 			dispatchEvent(new PuzzleEvent(PuzzleEvent.CHANGE_IMAGE, null, _textBox.text));
+			game.playButtonSound();
 		}
 		
 		private function changeImageHandler(e:Event):void {
@@ -137,11 +139,13 @@ package com.techlabs.puzzle {
 					dispatchEvent(new PuzzleEvent(PuzzleEvent.CHANGE_IMAGE, null, "hamster.jpg"));
 					break;
 			}
+			game.playButtonSound();
 		}
 		
 		private function mainMenuHandler(e:Event):void {
 			resetTimer();
 			game.loadMenuSystem();
+			game.playButtonSound();
 		}
 		
 		private function resetTimer() : void {

@@ -16,6 +16,7 @@ package {
 	import flash.display.StageQuality;
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
+	import flash.media.Sound;
 	import flash.net.URLRequest;
 	
 	import flashx.textLayout.formats.BackgroundColor;
@@ -53,18 +54,25 @@ package {
 		
 		private var _menuSystem:MenuSystem;
 		
+		//private var _backingTrack:Sound;
+		private var _buttonSound:Sound;
+		private var soundOn:Boolean = true;
+		
 		public function SlidingPuzzle() {
 			init();
 			loadMenuSystem();
 		}
 		
 		private function init() : void {
+			//_backingTrack = new Sound(new URLRequest("back1.mp3"));
+			_buttonSound = new Sound(new URLRequest("buttonPress.mp3"));
 			_slicer = new ImageSlicer();
 			_gameBoard = new PuzzleBoard();
 			_puzzleImages = new Array();
 			
 			initStage();
 			init3D();
+			//_backingTrack.play(0, 100);
 		}
 		
 		public function loadMenuSystem() : void {
@@ -110,6 +118,15 @@ package {
 
 		private function initPuzzle(imageURL:String):void {
 			loadPuzzleImage(imageURL);
+		}
+		
+		public function playButtonSound() : void {
+			if (soundOn)
+				_buttonSound.play();
+		}
+		
+		public function switchSound() : void {
+			soundOn = !soundOn;
 		}
 		
 		// Loads the image
