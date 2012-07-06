@@ -4,6 +4,7 @@ package {
 	import away3d.containers.View3D;
 	
 	import com.techlabs.puzzle.ControlPanel;
+	import com.techlabs.puzzle.MenuSystem;
 	import com.techlabs.puzzle.PuzzleBoard;
 	import com.techlabs.puzzle.events.PuzzleEvent;
 	import com.techlabs.puzzle.helpers.ImageSlicer;
@@ -14,9 +15,10 @@ package {
 	import flash.display.StageAlign;
 	import flash.display.StageQuality;
 	import flash.display.StageScaleMode;
-	
 	import flash.events.Event;
 	import flash.net.URLRequest;
+	
+	import flashx.textLayout.formats.BackgroundColor;
 	
 	/**
 	 * ...
@@ -48,22 +50,45 @@ package {
 		private var _camera:HoverCamera3D;
 
 		private var _controlPanel:ControlPanel;
-
+		
+		private var _menuSystem:MenuSystem;
+		
 		public function SlidingPuzzle() {
+			init();
+			loadMenuSystem();
+		}
+		
+		private function init() : void {
 			_slicer = new ImageSlicer();
-
 			_gameBoard = new PuzzleBoard();
 			_puzzleImages = new Array();
-
-			_controlPanel = new ControlPanel();
+			
+			initStage();
+			init3D();
+		}
+		
+		public function loadMenuSystem() : void {
+			if (_controlPanel != null)
+				_controlPanel.setVisible(false);
+			_controlPanel = null;
+			
+			_menuSystem = new MenuSystem(this);
+			_menuSystem.addEventListener(PuzzleEvent.CHANGE_IMAGE, imageChangeHandler);
+			addChild(_menuSystem);
+			
+			initPuzzle("puzzler_logo.png");
+		}		
+		
+		public function loadGame(timed:Boolean) : void {
+			_menuSystem.setVisible(false);
+			_menuSystem = null;
+			
+			_controlPanel = new ControlPanel(this, timed);
 			_controlPanel.addEventListener(PuzzleEvent.CHANGE_IMAGE, imageChangeHandler);
 			_controlPanel.addEventListener(PuzzleEvent.SHUFFLE, suffleHandler);
 			addChild(_controlPanel);
-
-			initStage();
-			init3D();
-
-			initPuzzle("http://taylorlifescience.pbworks.com/f/1266511756/hamster%201.jpg");
+			
+			initPuzzle("Flower.png");
 		}
 
 		private function initStage():void {
@@ -72,12 +97,12 @@ package {
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 		}
 
-		private function init3D():void {
+		private function init3D(xpos:int=400, ypos:int=300):void {
 			_camera = new HoverCamera3D();
 			_camera.minTiltAngle = 15;
 			_camera.maxTiltAngle = 65;
 
-			_view = new View3D({width:800, height:600, x:400, y:300, camera:_camera});
+			_view = new View3D({width:800, height:600, x:xpos, y:ypos, camera:_camera});
 			addChild(_view);
 
 			addEventListener(Event.ENTER_FRAME, enterFrameHandler);
@@ -107,7 +132,8 @@ package {
 			_view.scene.addChild(_gameBoard);
 			
 			// sets the preview image in the control panel
-			_controlPanel.setPreview(_image);
+			if (_controlPanel != null)
+				_controlPanel.setPreview(_image);
 		}
 
 		private function imageChangeHandler(e:PuzzleEvent):void {

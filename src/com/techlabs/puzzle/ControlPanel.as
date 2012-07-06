@@ -1,5 +1,6 @@
 package com.techlabs.puzzle {
 
+	import com.bit101.components.Label;
 	import com.bit101.components.ProgressBar;
 	import com.bit101.components.PushButton;
 	import com.bit101.components.Text;
@@ -10,17 +11,19 @@ package com.techlabs.puzzle {
 	import flash.display.PixelSnapping;
 	import flash.display.Sprite;
 	import flash.events.Event;
-	import flash.utils.Timer;
 	import flash.events.TimerEvent;
 	import flash.geom.Matrix;
+	import flash.utils.Timer;
 
 	public class ControlPanel extends Sprite {
 
 		private var _shuffleButton:PushButton;
 		private var _randomPuzzle:PushButton;
 		private var _uploadImage:PushButton;
+		private var _mainMenuImage:PushButton;
 		private var _textBox:Text;
 		private var _timerBar:ProgressBar;
+		private var _label:Label;
 		
 		private var _preview:Bitmap;
 		private var index:int = -1;
@@ -28,27 +31,51 @@ package com.techlabs.puzzle {
 		
 		private var gameTimer:Timer;
 		private const TIMER_DELAY:int = 1000;
+		private const TIMER_MAX:int = 10;
+		
+		private var game:SlidingPuzzle;
+		private var timed:Boolean;
 
-		public function ControlPanel() {
+		public function ControlPanel(game:SlidingPuzzle, timed:Boolean) {
+			this.game = game;
+			this.timed = timed;
 			
 			// Buttons
 			_shuffleButton = new PushButton(this, 20, 20, "Shuffle", shuffleBoardHandler);
 			_randomPuzzle = new PushButton(this, 20, 45, "Random Puzzle", changeImageHandler);
 			_uploadImage = new PushButton(this, 20, 70, "Upload Image", uploadImageHandler);
+			_mainMenuImage = new PushButton(this, 20, 105, "Main Menu", mainMenuHandler);
 			_textBox = new Text(this, 130, 70, "Image URL");
 			_textBox.height = 20;
 			_textBox.width = 200;
 			_textBox.visible = false;
 			
-			_timerBar = new ProgressBar(this, 150, 25);
-			_timerBar.width = 500;
-			_timerBar.maximum = 100;
-			_timerBar.value = 20;
-			
-			gameTimer = new Timer(TIMER_DELAY, _timerBar.maximum);
-			gameTimer.addEventListener(TimerEvent.TIMER, onGameTimerTick);
-			gameTimer.addEventListener(TimerEvent.TIMER_COMPLETE, onGameTimerComplete);
-			gameTimer.start();
+			if (timed) {
+				_timerBar = new ProgressBar(this, 150, 20);
+				_timerBar.width = 500;
+				_timerBar.maximum = TIMER_MAX;
+				_timerBar.value = 0;
+				
+				_label = new Label(this, 325, 30, "Press 'shuffle' to start timer...");
+				
+				gameTimer = new Timer(TIMER_DELAY, _timerBar.maximum);
+				gameTimer.addEventListener(TimerEvent.TIMER, onGameTimerTick);
+				gameTimer.addEventListener(TimerEvent.TIMER_COMPLETE, onGameTimerComplete);
+			}
+		}
+		
+		public function setVisible(b:Boolean) : void {
+			_shuffleButton.visible = b;
+			_randomPuzzle.visible = b;
+			_uploadImage.visible = b;
+			_mainMenuImage.visible = b;
+			_textBox.visible = b;
+			_preview.visible = b;
+			removeChild(_preview);
+			if (timed) {
+				_timerBar.visible = b;
+				_label.visible = b;	
+			}
 		}
 		
 		// Sets the small preview image
@@ -67,24 +94,31 @@ package com.techlabs.puzzle {
 		
 			var bmd:BitmapData = new BitmapData(image.width*scale, image.width*scale);
 			bmd.draw(image, m);
+			
+			// Remove last preview image (so we are not just drawing over old image)
+			if (_preview != null)
+				removeChild(_preview);
 			_preview = new Bitmap(bmd, PixelSnapping.AUTO, true);
 			
 			addChild(_preview);
 
 			_preview.x = 20;
-			_preview.y = 105;
+			_preview.y = 140;
 		}
 		
 		private function shuffleBoardHandler(e:Event):void {
 			dispatchEvent(new PuzzleEvent(PuzzleEvent.SHUFFLE));
+			restartTimer();
 		}
 
 		private function uploadImageHandler(e:Event):void {
+			resetTimer();
 			_textBox.visible = !_textBox.visible;
 			dispatchEvent(new PuzzleEvent(PuzzleEvent.CHANGE_IMAGE, null, _textBox.text));
 		}
 		
 		private function changeImageHandler(e:Event):void {
+			resetTimer();
 			index++;
 			if (index == MAX_INDEX)
 				index = 0;
@@ -104,13 +138,33 @@ package com.techlabs.puzzle {
 					break;
 			}
 		}
+		
+		private function mainMenuHandler(e:Event):void {
+			resetTimer();
+			game.loadMenuSystem();
+		}
+		
+		private function resetTimer() : void {
+			if (timed) {
+				gameTimer.reset();
+				_timerBar.value = 0;
+			}
+		}
+		
+		private function restartTimer() : void {
+			if (timed) {
+				gameTimer.reset();
+				_timerBar.value = 0;
+				gameTimer.start();
+			}
+		}
 			
 		private function onGameTimerTick(e:TimerEvent) : void {
 			_timerBar.value++;
 		}
 			
 		private function onGameTimerComplete(e:TimerEvent) : void {
-		
+			dispatchEvent(new PuzzleEvent(PuzzleEvent.CHANGE_IMAGE, null, "game_over.png"));
 		}
 		
 	}

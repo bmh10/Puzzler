@@ -132,7 +132,7 @@ package com.techlabs.puzzle {
 			return true;
 		}
 
-		private function clearBoard():void {
+		public function clearBoard():void {
 			for each(var p:PuzzlePiece in _pieces) {
 				p.removeEventListener(PuzzleEvent.CLICK, clickHandler);
 				p.removeEventListener(PuzzleEvent.MOVE, moveHandler);
@@ -140,6 +140,19 @@ package com.techlabs.puzzle {
 				removeChild(p);
 			}
 			_pieces = new Array();
+		}
+		
+		public function setImagesVisible(images:Array, visible:Boolean):void {
+			for each(var i:Bitmap in images)
+				i.visible = visible;
+		}
+		
+		public function deleteBoard() : void {
+			clearBoard();
+			for each(var p:PuzzlePiece in _pieces) {
+				p.image.visible = false;
+				p = null;
+			}
 		}
 
 		private function centerBoard():void {

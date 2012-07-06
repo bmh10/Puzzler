@@ -4,13 +4,12 @@ package com.techlabs.puzzle {
 	import away3d.materials.BitmapMaterial;
 	import away3d.primitives.Plane;
 	
-	import com.techlabs.puzzle.events.PuzzleEvent;
-	
-	import flash.display.Bitmap;
-	
 	import com.greensock.TweenLite;
 	import com.greensock.easing.Bounce;
 	import com.greensock.easing.Circ;
+	import com.techlabs.puzzle.events.PuzzleEvent;
+	
+	import flash.display.Bitmap;
 
 	/**
 	 * ...
@@ -26,11 +25,15 @@ package com.techlabs.puzzle {
 		private var _ease:Function = Circ.easeInOut;
 
 		private var _padding:int;
+		
+		public var image:Bitmap;
 
 		public function PuzzlePiece(image:Bitmap, init:Object = null) {
 			init.material = new BitmapMaterial(image.bitmapData, {smoothing:true})
 			super(init);
-
+			
+			this.image = image;
+			
 			_padding = SlidingPuzzle.padding;
 			addOnMouseDown(mouseDownHandler);
 		}
