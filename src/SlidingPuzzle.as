@@ -29,6 +29,7 @@ package {
 	public class SlidingPuzzle extends Sprite {
 		
 		// Defines how the puzzle will be divided
+		// NB must be a multiple of 'size' (otherwise moving pieces will break)
 		public static var subdivisions:int = 4;
 		
 		// Padding between the pieces
@@ -73,6 +74,18 @@ package {
 			initStage();
 			init3D();
 			//_backingTrack.play(0, 100);
+		}
+		
+		public function newDifficulty(diff:int) : void {
+			subdivisions = diff;
+			_view.scene.removeChild(_gameBoard);
+			initPuzzle("puzzler_logo.png");
+		}
+		
+		public function newPadding(pad:int) : void {
+			padding = pad;
+			_view.scene.removeChild(_gameBoard);
+			initPuzzle("puzzler_logo.png");
 		}
 		
 		public function loadMenuSystem() : void {

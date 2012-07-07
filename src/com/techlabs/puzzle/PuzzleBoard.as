@@ -23,16 +23,17 @@ package com.techlabs.puzzle {
 		private var _pieces:Array = new Array();
 
 		public function PuzzleBoard() {
-			_boardWidth = SlidingPuzzle.size + SlidingPuzzle.padding * SlidingPuzzle.subdivisions;
-			_boardHeight = SlidingPuzzle.size + SlidingPuzzle.padding * SlidingPuzzle.subdivisions;
-
-			_pieceWidth = SlidingPuzzle.size / SlidingPuzzle.subdivisions;
-			_pieceHeight = SlidingPuzzle.size / SlidingPuzzle.subdivisions;
-
-			_padding = SlidingPuzzle.padding;
 		}
 
 		public function createPuzzle(images:Array):void {
+			_boardWidth = SlidingPuzzle.size + SlidingPuzzle.padding * SlidingPuzzle.subdivisions;
+			_boardHeight = SlidingPuzzle.size + SlidingPuzzle.padding * SlidingPuzzle.subdivisions;
+			
+			_pieceWidth = SlidingPuzzle.size / SlidingPuzzle.subdivisions;
+			_pieceHeight = SlidingPuzzle.size / SlidingPuzzle.subdivisions;
+			
+			_padding = SlidingPuzzle.padding;
+			
 			clearBoard();
 
 			var pieceCount:int = 0;
@@ -45,7 +46,6 @@ package com.techlabs.puzzle {
 					var image:Bitmap = images[yp][xp];
 					var piece:PuzzlePiece = new PuzzlePiece(image, {width:_pieceWidth, height:_pieceHeight, segmentsH:3, segmentsW:3});
 					piece.addEventListener(PuzzleEvent.CLICK, clickHandler);
-
 					piece.addEventListener(PuzzleEvent.MOVE, moveHandler);
 					piece.addEventListener(PuzzleEvent.READY, moveHandler);
 
@@ -147,14 +147,6 @@ package com.techlabs.puzzle {
 				i.visible = visible;
 		}
 		
-		public function deleteBoard() : void {
-			clearBoard();
-			for each(var p:PuzzlePiece in _pieces) {
-				p.image.visible = false;
-				p = null;
-			}
-		}
-
 		private function centerBoard():void {
 			x = -(_boardWidth * .5 - _pieceWidth * .5);
 			z = _boardHeight * .5 - _pieceHeight * .5;

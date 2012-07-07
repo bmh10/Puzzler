@@ -31,7 +31,7 @@ package com.techlabs.puzzle {
 		
 		private var gameTimer:Timer;
 		private const TIMER_DELAY:int = 1000;
-		private const TIMER_MAX:int = 10;
+		private const TIMER_MAX:int = 500;
 		
 		private var game:SlidingPuzzle;
 		private var timed:Boolean;
